@@ -13,14 +13,15 @@ import java.util.List;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "TYPE")
+@DiscriminatorColumn(name = "TYPE",length = 4)
 @Data @AllArgsConstructor
 @NoArgsConstructor
 public class BankAccount {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     private String id;
     private double balance;
     private Date createdAccount;
+    @Enumerated(EnumType.STRING)
     private AccountStatus status;
     @ManyToOne
     private  Customer customer;
