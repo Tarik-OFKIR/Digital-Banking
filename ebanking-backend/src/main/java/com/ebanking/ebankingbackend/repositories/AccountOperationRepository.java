@@ -1,6 +1,6 @@
 package com.ebanking.ebankingbackend.repositories;
 
-import org.sid.ebankingbackend.entities.AccountOperation;
+import com.ebanking.ebankingbackend.entities.AccountOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
