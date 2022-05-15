@@ -198,3 +198,136 @@ public interface CustomerRepository extends JpaRepository<Customer,Long> {
     List<Customer> searchCustomer(@Param("kw") String keyword);
 }
 ```
+### Mappers
+```java
+package com.ebanking.ebankingbackend.mappers;
+
+import com.ebanking.ebankingbackend.dtos.AccountOperationDTO;
+import com.ebanking.ebankingbackend.dtos.CurrentBankAccountDTO;
+import com.ebanking.ebankingbackend.dtos.CustomerDTO;
+import com.ebanking.ebankingbackend.dtos.SavingBankAccountDTO;
+import com.ebanking.ebankingbackend.entities.AccountOperation;
+import com.ebanking.ebankingbackend.entities.CurrentAccount;
+import com.ebanking.ebankingbackend.entities.Customer;
+import com.ebanking.ebankingbackend.entities.SavingAccount;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
+
+@Service
+public class BankAccountMapperImpl {
+    public CustomerDTO fromCustomer(Customer customer){
+        CustomerDTO customerDTO=new CustomerDTO();
+        BeanUtils.copyProperties(customer,customerDTO);
+        return  customerDTO;
+    }
+    public Customer fromCustomerDTO(CustomerDTO customerDTO){
+        Customer customer=new Customer();
+        BeanUtils.copyProperties(customerDTO,customer);
+        return  customer;
+    }
+
+    public SavingBankAccountDTO fromSavingBankAccount(SavingAccount savingAccount){
+        SavingBankAccountDTO savingBankAccountDTO=new SavingBankAccountDTO();
+        BeanUtils.copyProperties(savingAccount,savingBankAccountDTO);
+        savingBankAccountDTO.setCustomerDTO(fromCustomer(savingAccount.getCustomer()));
+        savingBankAccountDTO.setType(savingAccount.getClass().getSimpleName());
+        return savingBankAccountDTO;
+    }
+
+    public SavingAccount fromSavingBankAccountDTO(SavingBankAccountDTO savingBankAccountDTO){
+        SavingAccount savingAccount=new SavingAccount();
+        BeanUtils.copyProperties(savingBankAccountDTO,savingAccount);
+        savingAccount.setCustomer(fromCustomerDTO(savingBankAccountDTO.getCustomerDTO()));
+        return savingAccount;
+    }
+
+    public CurrentBankAccountDTO fromCurrentBankAccount(CurrentAccount currentAccount){
+        CurrentBankAccountDTO currentBankAccountDTO=new CurrentBankAccountDTO();
+        BeanUtils.copyProperties(currentAccount,currentBankAccountDTO);
+        currentBankAccountDTO.setCustomerDTO(fromCustomer(currentAccount.getCustomer()));
+        currentBankAccountDTO.setType(currentAccount.getClass().getSimpleName());
+        return currentBankAccountDTO;
+    }
+
+    public CurrentAccount fromCurrentBankAccountDTO(CurrentBankAccountDTO currentBankAccountDTO){
+        CurrentAccount currentAccount=new CurrentAccount();
+        BeanUtils.copyProperties(currentBankAccountDTO,currentAccount);
+        currentAccount.setCustomer(fromCustomerDTO(currentBankAccountDTO.getCustomerDTO()));
+        return currentAccount;
+    }
+
+    public AccountOperationDTO fromAccountOperation(AccountOperation accountOperation){
+        AccountOperationDTO accountOperationDTO=new AccountOperationDTO();
+        BeanUtils.copyProperties(accountOperation,accountOperationDTO);
+        return accountOperationDTO;
+    }
+
+}
+```
+### Exceptions
+#### BalanceNotSufficientException
+```java
+package com.ebanking.ebankingbackend.exceptions;
+
+public class BalanceNotSufficientException extends Exception {
+    public BalanceNotSufficientException(String message) {
+        super(message);
+    }
+}
+```
+#### BankAccountNotFoundException
+```java 
+package com.ebanking.ebankingbackend.exceptions;
+
+public class BankAccountNotFoundException extends Exception {
+    public BankAccountNotFoundException(String message) {
+        super(message);
+    }
+}
+```
+#### CustomerNotFoundException
+```java
+package com.ebanking.ebankingbackend.exceptions;
+public class CustomerNotFoundException extends Exception {
+    public CustomerNotFoundException(String message) {
+        super(message);
+    }
+}
+```
+### 
+```java
+package com.ebanking.ebankingbackend.services;
+
+import com.ebanking.ebankingbackend.dtos.*;
+import com.ebanking.ebankingbackend.exceptions.BalanceNotSufficientException;
+import com.ebanking.ebankingbackend.exceptions.BankAccountNotFoundException;
+import com.ebanking.ebankingbackend.exceptions.CustomerNotFoundException;
+
+
+import java.util.List;
+
+public interface BankAccountService {
+    CustomerDTO saveCustomer(CustomerDTO customerDTO);
+    CurrentBankAccountDTO saveCurrentBankAccount(double initialBalance, double overDraft, Long customerId) throws CustomerNotFoundException;
+    SavingBankAccountDTO saveSavingBankAccount(double initialBalance, double interestRate, Long customerId) throws CustomerNotFoundException;
+    List<CustomerDTO> listCustomers();
+    BankAccountDTO getBankAccount(String accountId) throws BankAccountNotFoundException;
+    void debit(String accountId, double amount, String description) throws BankAccountNotFoundException, BalanceNotSufficientException;
+    void credit(String accountId, double amount, String description) throws BankAccountNotFoundException;
+    void transfer(String accountIdSource, String accountIdDestination, double amount) throws BankAccountNotFoundException, BalanceNotSufficientException;
+
+    List<BankAccountDTO> bankAccountList();
+
+    CustomerDTO getCustomer(Long customerId) throws CustomerNotFoundException;
+
+    CustomerDTO updateCustomer(CustomerDTO customerDTO);
+
+    void deleteCustomer(Long customerId);
+
+    List<AccountOperationDTO> accountHistory(String accountId);
+
+    AccountHistoryDTO getAccountHistory(String accountId, int page, int size) throws BankAccountNotFoundException;
+
+    List<CustomerDTO> searchCustomers(String keyword);
+}
+```
