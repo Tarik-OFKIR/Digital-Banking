@@ -13,5 +13,5 @@ import javax.persistence.Entity;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SavingAccount extends BankAccount{
-    private double overDraft;
+    private double interestRate;
 }
