@@ -10,6 +10,7 @@ import { NavbarComponent } from './navbar/navbar.component';
 import { NewCustomerComponent } from './new-customer/new-customer.component';
 import {HttpClientModule} from "@angular/common/http";
 import {ReactiveFormsModule} from "@angular/forms";
+import { LoginComponent } from './login/login.component';
 
 // @ts-ignore
 @NgModule({
@@ -19,7 +20,8 @@ import {ReactiveFormsModule} from "@angular/forms";
     CustomerAccountsComponent,
     CustomersComponent,
     NavbarComponent,
-    NewCustomerComponent
+    NewCustomerComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
